@@ -7,7 +7,10 @@ import soundfile as sf
 import librosa 
 import pyttsx3
 import os
-import speech_recognition as sr  
+import speech_recognition as sr    
+
+
+
 # Initialize the recognizer
 r = sr.Recognizer()
 
@@ -61,7 +64,7 @@ def extract_features(audio_data, sample_rate, n_mfcc=42, max_pad_len=100):
 classes = ['laafi', 'nii-yibeugo','nii-zabre', 'ni-winiga', 'oub ya laafi','winig-kibare','yibeog-kibare', 'yika laafi', 'zabre kibare', 'zackramba']
 engine = pyttsx3.init()
 audio_path="english_audio.wav"
-
+moore_audio_path=''
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the ML Model API"}
@@ -69,12 +72,16 @@ def read_root():
 @app.post("/predict/moore_to_english")
 async def predict_audio(file: UploadFile = File(...)):
     try:
+        print("Received file for prediction")
         if os.path.exists(audio_path):
             os.remove(audio_path)
         audio_bytes = await file.read()
-
+         
+        try:        
         # Load the audio file
-        audio_data, sample_rate = sf.read(BytesIO(audio_bytes))
+            audio_data, sample_rate = sf.read(BytesIO(audio_bytes))
+        except Exception as e:
+            print(f" erreur de lecture du fichier : {e}")
 
         # Extract features from the audio data
         features = extract_features(audio_data, sample_rate)
@@ -108,6 +115,8 @@ async def predict_audio(file: UploadFile = File(...)):
     
 
     except Exception as e:
+        print(f"Error during prediction: {e}", exc_info=True)
+
         raise HTTPException(status_code=500, detail=str(e))
 
         
@@ -127,8 +136,9 @@ async def predict_audio(file: UploadFile = File(...)):
             audio_content = recognizer.record(source)
             recognized_text = recognizer.recognize_google(audio_content)
             moore_text= dic_english_moore.get(recognized_text, "Translation not found")
-        return {"recognized_text": recognized_text, "moore_translation": moore_text}
-    
+            moore_audio_path= "moore-audios/"+moore_text+".wav"
+        return FileResponse(path=moore_audio_path, media_type='audio/wav', filename= 'moore_audio.wav')
+     
     except sr.UnknownValueError:
         raise HTTPException(status_code=400, detail="Could not understand the audio")
     except sr.RequestError as e:
