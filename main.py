@@ -42,7 +42,7 @@ dic_english_moore = {
 }
 
 # Load the trained model
-model = tf.keras.models.load_model("audio_classification_model.h5")
+model = tf.keras.models.load_model("audi_classification_final.h5")
 
 def extract_features(audio_data, sample_rate, n_mfcc=42, max_pad_len=100):
     if len(audio_data.shape) == 2:
