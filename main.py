@@ -1,5 +1,3 @@
-
-
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import FileResponse
 import numpy as np
@@ -10,6 +8,7 @@ import librosa
 import pyttsx3
 import os
 import speech_recognition as sr
+ 
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -42,7 +41,7 @@ dic_english_moore = {
 }
 
 # Load the trained model
-model = tf.keras.models.load_model("audi_classification_final.h5")
+model = tf.keras.models.load_model("audio_classification_model.h5", compile=True)
 
 def extract_features(audio_data, sample_rate, n_mfcc=42, max_pad_len=100):
     if len(audio_data.shape) == 2:

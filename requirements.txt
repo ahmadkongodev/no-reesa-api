@@ -1,0 +1,8 @@
+fastapi==0.111.0
+uvicorn
+python-multipart
+tensorflow
+librosa
+soundfile
+pyttsx3
+SpeechRecognition
